@@ -36,7 +36,7 @@ const PaymentPage = () => {
     // Fetch data from the API endpoint
     const fetchPendingPayments = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/payments/pending-payments");
+        const response = await fetch("https://wagewise-backend.onrender.com/api/payments/pending-payments");
         const data = await response.json();
         setPendingPayments(data);
       } catch (error) {
@@ -170,7 +170,7 @@ const PaymentPage = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:5000/api/payments/individual-payment", {
+      const response = await fetch("https://wagewise-backend.onrender.com/api/payments/individual-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(paymentDetails),
@@ -191,7 +191,7 @@ const PaymentPage = () => {
           const newPayDate = getNextPayDate(payment.next_pay_date, payment.frequency);
           const newPaymentRecord = { ...payment, pay_date: payment.next_pay_date, next_pay_date: newPayDate, status: "pending" };
 
-          await fetch("http://localhost:5000/api/payments", {
+          await fetch("https://wagewise-backend.onrender.com/api/payments", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(newPaymentRecord),

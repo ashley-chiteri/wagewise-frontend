@@ -50,7 +50,7 @@ const PaymentButton = ({ payment, setPendingPayments, pendingPayments, generateP
     };
 
     try {
-      const response = await fetch("http://localhost:5000/api/payments/individual-payment", {
+      const response = await fetch("https://wagewise-backend.onrender.com/api/payments/individual-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(paymentDetails),
@@ -71,7 +71,7 @@ const PaymentButton = ({ payment, setPendingPayments, pendingPayments, generateP
           const newPayDate = getNextPayDate(payment.next_pay_date, payment.frequency);
           const newPaymentRecord = { ...payment, pay_date: payment.next_pay_date, next_pay_date: newPayDate, status: "pending" };
 
-          await fetch("http://localhost:5000/api/payments", {
+          await fetch("https://wagewise-backend.onrender.com/api/payments", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(newPaymentRecord),

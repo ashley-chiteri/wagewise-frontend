@@ -22,7 +22,7 @@ const LoginPage: React.FC = () => {
 
   const onSubmit: SubmitHandler<LoginFormData> = async (data) => {
     try {
-        const response = await axios.post("http://localhost:5000/api/users/login", {
+        const response = await axios.post("https://wagewise-backend.onrender.com/api/users/login", {
             Username: data.Username,
             Password: data.Password,
         });

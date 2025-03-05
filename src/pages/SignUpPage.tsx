@@ -30,7 +30,7 @@ const SignUpPage: React.FC = () => {
       }
 
       // Send the request to the backend
-      const response = await axios.post("http://localhost:5000/api/users", {
+      const response = await axios.post("https://wagewise-backend.onrender.com/api/users", {
         Username: data.Username,
         Password: data.Password, // Send plain-text password
       });

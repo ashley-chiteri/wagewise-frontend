@@ -115,7 +115,7 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
 
         try {
             const response = await fetch(
-                `http://localhost:5000/api/employees/${formData.employee_id}`,
+                `https://wagewise-backend.onrender.com/api/employees/${formData.employee_id}`,
                 {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
@@ -138,7 +138,7 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
             toast.success("Employee updated successfully!", { duration: 3000 });
             // Step 3: Update the payment record
             const updatePaymentResponse = await fetch(
-                `http://localhost:5000/api/payments/${formData.employee_id}`,
+                `https://wagewise-backend.onrender.com/api/payments/${formData.employee_id}`,
                 {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },

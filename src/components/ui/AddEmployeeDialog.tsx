@@ -70,7 +70,7 @@ const AddEmployeeDialog = ({ isOpen, onClose, onSubmit }: AddEmployeeDialogProps
 
   const handleFormSubmit = async (data: any) => {
     try {
-      const response = await axios.post("http://localhost:5000/api/employees", data);
+      const response = await axios.post("https://wagewise-backend.onrender.com/api/employees", data);
       const newEmployee = response.data; // Get the created employee from the response
 
       // Ensure Sonner is working
@@ -83,7 +83,7 @@ const AddEmployeeDialog = ({ isOpen, onClose, onSubmit }: AddEmployeeDialogProps
       const payrollDetails = calculatePayrollDetails(salary);
 
       // Step 3: Add payroll details to Payments_tbl
-      await axios.post("http://localhost:5000/api/payments", {
+      await axios.post("https://wagewise-backend.onrender.com/api/payments", {
         employee_id: newEmployee.employee_id,
         ...payrollDetails
       });

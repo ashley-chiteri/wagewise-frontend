@@ -18,7 +18,7 @@ const AccountPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetch("http://localhost:5000/api/users")
+        fetch("https://wagewise-backend.onrender.com/api/users")
         .then(res => res.json())
         .then(data => {
             console.log("User API Response:", data); // ✅ Debugging log
@@ -32,7 +32,7 @@ const AccountPage = () => {
         })
         .catch(error => console.error("Error fetching user data:", error));
 
-        fetch("http://localhost:5000/api/organizations")
+        fetch("https://wagewise-backend.onrender.com/api/organizations")
             .then(res => res.json())
             .then(data => {
                 console.log("Organization API Response:", data); // ✅ Debugging log
@@ -69,7 +69,7 @@ const AccountPage = () => {
     };
 
     const handleSubmit = () => {
-        fetch("http://localhost:5000//api/organizations", {
+        fetch("https://wagewise-backend.onrender.com/api/organizations", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(formData)

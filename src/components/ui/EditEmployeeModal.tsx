@@ -72,7 +72,7 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
 
         try {
             const response = await fetch(
-                `http://localhost:5000/api/employees/${formData.employee_id}`,
+                `https://wagewise-backend.onrender.com/api/employees/${formData.employee_id}`,
                 {
                     method: "PUT",
                     headers: {

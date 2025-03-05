@@ -24,7 +24,7 @@ const DashboardPage: React.FC = () => {
 
     //fetching total active employees
     useEffect(() => {
-        fetch("http://localhost:5000/api/employees/active-count")
+        fetch("https://wagewise-backend.onrender.com/api/employees/active-count")
             .then((res) => res.json())
             .then((data) => setActiveEmployees(data.totalActiveEmployees))
             .catch((error) => console.error("Error fetching data:", error));
@@ -32,7 +32,7 @@ const DashboardPage: React.FC = () => {
 
     //fetching total spent last month
     useEffect(() => {
-        fetch("http://localhost:5000/api/payments/last-month-total")
+        fetch("https://wagewise-backend.onrender.com/api/payments/last-month-total")
             .then((res) => res.json())
             .then((data) => setTotalSpentLastMonth(data.totalSpent))
             .catch((error) => console.error("Error fetching data:", error));
@@ -40,7 +40,7 @@ const DashboardPage: React.FC = () => {
 
     //fetching due soon count
     useEffect(() => {
-        fetch("http://localhost:5000/api/payments/due-soon-count") // Adjust the URL if needed
+        fetch("https://wagewise-backend.onrender.com/api/payments/due-soon-count") // Adjust the URL if needed
             .then((response) => response.json())
             .then((data) => setDueSoonCount(data.dueSoonCount))
             .catch((error) => console.error("Error fetching data:", error));

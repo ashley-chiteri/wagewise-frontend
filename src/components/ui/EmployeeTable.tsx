@@ -48,7 +48,7 @@ export default function EmployeeTable() {
     const fetchEmployees = async () => {
         try {
             setLoading(true);
-            const response = await fetch("http://localhost:5000/api/employees");
+            const response = await fetch("https://wagewise-backend.onrender.com/api/employees");
             const data: Employee[] = await response.json();
             setEmployees(data);
         } catch (error) {
@@ -74,7 +74,7 @@ export default function EmployeeTable() {
     const handleDelete = async (id: number) => {
         if (!confirm("Are you sure you want to delete this employee?")) return;
         try {
-            await fetch(`http://localhost:5000/api/employees/${id}`, { method: "DELETE" });
+            await fetch(`https://wagewise-backend.onrender.com/api/employees/${id}`, { method: "DELETE" });
             setEmployees((prev) => prev.filter((emp) => emp.employee_id !== id));
             toast.success("Employee deleted successfully", {
                 duration: 3000,

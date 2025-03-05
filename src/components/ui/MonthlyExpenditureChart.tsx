@@ -5,7 +5,7 @@ const MonthlyExpenditureChart = () => {
   const [data, setData] = useState<{ month: string; totalSpent: number }[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/payments/monthly-expenditure") // Adjust URL if needed
+    fetch("https://wagewise-backend.onrender.com/api/payments/monthly-expenditure") // Adjust URL if needed
       .then((response) => response.json())
       .then((json) => {
         console.log("API Response:", json); // ✅ Debugging Log
