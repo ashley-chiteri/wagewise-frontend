@@ -13699,6 +13699,7 @@ const createMainWindow = () => {
       nodeIntegration: false,
       // Keep security best practices
       contextIsolation: true
+      //webSecurity: false,
     }
   });
   mainWindow.maximize();

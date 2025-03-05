@@ -37,7 +37,8 @@ const createMainWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
       nodeIntegration: false, // Keep security best practices
-      contextIsolation: true
+      contextIsolation: true,
+      //webSecurity: false,
     },
   });
 
