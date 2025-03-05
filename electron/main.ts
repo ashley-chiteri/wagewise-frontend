@@ -1,6 +1,7 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, dialog} from 'electron';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { autoUpdater } from "electron-updater";
 import path from 'node:path';
 
 const require = createRequire(import.meta.url);
@@ -35,6 +36,8 @@ const createMainWindow = () => {
     show: true, // Show the main window immediately
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
+      nodeIntegration: false, // Keep security best practices
+      contextIsolation: true
     },
   });
 
@@ -66,6 +69,9 @@ const createMainWindow = () => {
 app.whenReady().then(() => {
   // Create the main window
   createMainWindow();
+
+   // ✅ Check for updates when the app starts
+   autoUpdater.checkForUpdatesAndNotify();
 });
 
 // Quit when all windows are closed, except on macOS.
@@ -80,4 +86,35 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createMainWindow();
   }
+});
+
+// ✅ Auto-Updater Events
+autoUpdater.on('update-available', () => {
+  if (mainWindow) {
+    dialog.showMessageBox(mainWindow, {
+      type: "info",
+      title: "Update Available",
+      message: "A new version of Wagewise is available. It will be downloaded in the background.",
+      buttons: ["OK"]
+    });
+  }
+});
+
+autoUpdater.on('update-downloaded', () => {
+  if (mainWindow) {
+    dialog.showMessageBox(mainWindow, {
+      type: "info",
+      title: "Update Ready",
+      message: "The update has been downloaded. Restart Wagewise to apply the update.",
+      buttons: ["Restart Now", "Later"]
+    }).then(result => {
+      if (result.response === 0) { // Restart Now
+        autoUpdater.quitAndInstall();
+      }
+    });
+  }
+});
+
+autoUpdater.on('error', (error) => {
+  console.error("Update Error:", error);
 });

@@ -1,9 +1,10 @@
 // @see - https://www.electron.build/configuration/configuration
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "YourAppID",
+  "appId": "com.ashleychiteri.wagewise",
   "asar": true,
-  "productName": "YourAppName",
+  "productName": "Wagewise",
+  "author": "Ashley Chiteri",
   "directories": {
     "output": "release/${version}"
   },
@@ -26,7 +27,7 @@
         ]
       }
     ],
-    "artifactName": "${productName}-Windows-${version}-Setup.${ext}"
+    "artifactName": "Wagewise-Windows-${version}-Setup.${ext}"
   },
   "nsis": {
     "oneClick": false,
@@ -38,6 +39,14 @@
     "target": [
       "AppImage"
     ],
-    "artifactName": "${productName}-Linux-${version}.${ext}"
-  }
+    "artifactName": "Wagewise-Linux-${version}.${ext}"
+  },
+   "compression": "maximum",
+  "publish": [
+    {
+      "provider": "github",
+      "repo": "wagewise_frontend",
+      "owner": "ashley-chiteri",
+      "releaseType": "draft"
+    }
 }
