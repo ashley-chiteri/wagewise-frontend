@@ -25,17 +25,10 @@ const SplashScreen = () => {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex flex-col items-center justify-center h-screen "
+          className="flex flex-col items-center justify-center h-screen"
         >
-          {/* Logo with animation */}
-          <motion.img
-            src={companyLogo}
-            alt="Company Logo"
-            className="w-48 h-48 mb-8"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          />
+          {/* Logo without animation */}
+          <img src={companyLogo} alt="Company Logo" className="w-48 h-48 mb-8" />
 
           {/* Loading Spinner */}
           <motion.div
@@ -43,16 +36,6 @@ const SplashScreen = () => {
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
           />
-
-          {/* Optional: Loading Text */}
-          {/* <motion.p
-            className="mt-4 text-gray-600"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-          >
-            Loading...
-          </motion.p> */}
         </motion.div>
       )}
     </AnimatePresence>

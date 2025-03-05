@@ -21,6 +21,10 @@ const createMainWindow = () => {
       preload: path.join(__dirname, "preload.mjs")
     }
   });
+  mainWindow.maximize();
+  mainWindow.on("ready-to-show", () => {
+    mainWindow == null ? void 0 : mainWindow.show();
+  });
   mainWindow.webContents.on("did-finish-load", () => {
     mainWindow == null ? void 0 : mainWindow.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
   });

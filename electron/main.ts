@@ -38,6 +38,14 @@ const createMainWindow = () => {
     },
   });
 
+  // Maximize the window
+  mainWindow.maximize();
+
+  // Show the window once it's ready
+  mainWindow.on('ready-to-show', () => {
+    mainWindow?.show();
+  });
+
   // Test active push message to Renderer-process.
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow?.webContents.send('main-process-message', new Date().toLocaleString());
