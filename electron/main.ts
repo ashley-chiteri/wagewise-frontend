@@ -7,15 +7,6 @@ import path from 'node:path';
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// The built directory structure
-//
-// ├─┬─┬ dist
-// │ │ └── index.html
-// │ │
-// │ ├─┬ dist-electron
-// │ │ ├── main.js
-// │ │ └── preload.mjs
-// │
 process.env.APP_ROOT = path.join(__dirname, '..');
 
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
@@ -27,13 +18,18 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 
 
 let mainWindow: BrowserWindow | null = null;
 
+// Determine app paths
+const isDev = !app.isPackaged;
+const appPath = isDev ? __dirname : path.join(process.resourcesPath);
+const rendererDist = path.join(appPath, "dist");
+
 // Create the main application window
 const createMainWindow = () => {
   mainWindow = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     width: 1200,
     height: 800,
-    show: true, // Show the main window immediately
+    show: false, // Show the main window immediately
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
       nodeIntegration: false, // Keep security best practices
@@ -44,6 +40,13 @@ const createMainWindow = () => {
 
   // Maximize the window
   mainWindow.maximize();
+
+  // Load correct index.html based on environment
+  if (isDev) {
+    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL!);
+  } else {
+    mainWindow.loadFile(path.join(rendererDist, "index.html"));
+  }
 
   // Show the window once it's ready
   mainWindow.on('ready-to-show', () => {
@@ -72,7 +75,9 @@ app.whenReady().then(() => {
   createMainWindow();
 
    // ✅ Check for updates when the app starts
-   autoUpdater.checkForUpdatesAndNotify();
+   if (!isDev) {
+    autoUpdater.checkForUpdatesAndNotify();
+  }
 });
 
 // Quit when all windows are closed, except on macOS.
@@ -90,16 +95,17 @@ app.on('activate', () => {
 });
 
 // ✅ Auto-Updater Events
-autoUpdater.on('update-available', () => {
-  if (mainWindow) {
-    dialog.showMessageBox(mainWindow, {
-      type: "info",
-      title: "Update Available",
-      message: "A new version of Wagewise is available. It will be downloaded in the background.",
-      buttons: ["OK"]
-    });
-  }
-});
+if (!isDev) {
+  autoUpdater.on('update-available', () => {
+    if (mainWindow) {
+      dialog.showMessageBox(mainWindow, {
+        type: "info",
+        title: "Update Available",
+        message: "A new version of Wagewise is available. It will be downloaded in the background.",
+        buttons: ["OK"]
+      });
+    }
+  });
 
 autoUpdater.on('update-downloaded', () => {
   if (mainWindow) {
@@ -119,3 +125,4 @@ autoUpdater.on('update-downloaded', () => {
 autoUpdater.on('error', (error) => {
   console.error("Update Error:", error);
 });
+}
