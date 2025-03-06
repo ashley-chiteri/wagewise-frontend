@@ -1,5 +1,5 @@
-import { app, BrowserWindow,} from 'electron';
-//import { autoUpdater } from 'electron-updater';
+import { app, BrowserWindow, dialog} from 'electron';
+import { autoUpdater } from 'electron-updater';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 //import fs from 'fs';
@@ -68,75 +68,55 @@ app.on('activate', () => {
   }
 })
 
-app.whenReady().then(createMainWindow)
+// Function to check for updates
+const checkForUpdates = () => {
+  autoUpdater.setFeedURL({
+    provider: 'github',
+    owner: 'ashley-chiteri',
+    repo: 'wagewise-frontend',
+  });
 
-// /**
-//  * Initialize the application.
-//  */
-// const initializeApp = () => {
-//   console.log('✅ App is ready');
-//   createMainWindow();
+  autoUpdater.checkForUpdatesAndNotify();
 
-//   if (!isDev) {
-//     console.log('🔄 Checking for updates...');
-//     autoUpdater.setFeedURL({
-//       provider: 'github',
-//       owner: 'ashley-chiteri',
-//       repo: 'wagewise-frontend',
-//     });
-//     autoUpdater.checkForUpdatesAndNotify();
-//   }
-// };
+  autoUpdater.on('update-available', () => {
+    console.log('⬆️ Update available');
+    if (mainWindow) {
+      dialog.showMessageBox(mainWindow, {
+        type: 'info',
+        title: 'Update Available',
+        message: 'A new version of Wagewise is available. It will be downloaded in the background.',
+        buttons: ['OK'],
+      });
+    }
+  });
 
-// /**
-//  * Handle auto-updater events.
-//  */
-// const setupAutoUpdater = () => {
-//   autoUpdater.on('update-available', () => {
-//     console.log('⬆️ Update available');
-//     if (mainWindow) {
-//       dialog.showMessageBox(mainWindow, {
-//         type: 'info',
-//         title: 'Update Available',
-//         message: 'A new version of Wagewise is available. It will be downloaded in the background.',
-//         buttons: ['OK'],
-//       });
-//     }
-//   });
+  autoUpdater.on('update-downloaded', () => {
+    console.log('⬇️ Update downloaded');
+    if (mainWindow) {
+      dialog
+        .showMessageBox(mainWindow, {
+          type: 'info',
+          title: 'Update Ready',
+          message: 'The update has been downloaded. Restart Wagewise to apply the update.',
+          buttons: ['Restart Now', 'Later'],
+        })
+        .then((result) => {
+          if (result.response === 0) autoUpdater.quitAndInstall();
+        });
+    }
+  });
 
-//   autoUpdater.on('update-downloaded', () => {
-//     console.log('⬇️ Update downloaded');
-//     if (mainWindow) {
-//       dialog.showMessageBox(mainWindow, {
-//         type: 'info',
-//         title: 'Update Ready',
-//         message: 'The update has been downloaded. Restart Wagewise to apply the update.',
-//         buttons: ['Restart Now', 'Later'],
-//       }).then((result) => {
-//         if (result.response === 0) autoUpdater.quitAndInstall();
-//       });
-//     }
-//   });
+  autoUpdater.on('error', (error) => {
+    console.error('❌ Update Error:', error);
+  });
+};
 
-//   autoUpdater.on('error', (error) => {
-//     console.error('❌ Update Error:', error);
-//   });
-// };
+// Run update check only in production
+app.whenReady().then(() => {
+  createMainWindow();
+  if (!VITE_DEV_SERVER_URL) {
+    checkForUpdates();
+  }
+});
 
-// // ✅ Initialize the app
-// app.whenReady().then(initializeApp);
 
-// // ✅ Quit the app when all windows are closed (except on macOS)
-// app.on('window-all-closed', () => {
-//   if (process.platform !== 'darwin') app.quit();
-// });
-
-// // ✅ Recreate the window if the app is activated (macOS)
-// app.on('activate', () => {
-//   if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
-// });
-
-// // ✅ Set up auto-updater (only in production)
-// if (!isDev) {
-//   setupAutoUpdater();
-// }
