@@ -1,128 +1,117 @@
-import { app, BrowserWindow, dialog} from 'electron';
-import { createRequire } from 'node:module';
-import { fileURLToPath } from 'node:url';
-import { autoUpdater } from "electron-updater";
+import { app, BrowserWindow, dialog } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import fs from 'fs';
 
-const require = createRequire(import.meta.url);
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// ✅ Define __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-process.env.APP_ROOT = path.join(__dirname, '..');
-
-// 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
-export const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL'];
-export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron');
-export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist');
-
-process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST;
+console.log('✅ Main process started');
+console.log('__dirname:', __dirname);
 
 let mainWindow: BrowserWindow | null = null;
 
-// Determine app paths
 const isDev = !app.isPackaged;
-const appPath = isDev ? __dirname : path.join(process.resourcesPath);
-const rendererDist = path.join(appPath, "dist");
+const appPath = isDev ? __dirname : process.resourcesPath;
+const rendererDist = isDev
+  ? path.join(__dirname, '..', 'dist') // Dev mode
+  : path.join(appPath, 'dist'); // Production mode
 
-// Create the main application window
+console.log('📂 App path:', appPath);
+console.log('📂 Renderer dist path:', rendererDist);
+
 const createMainWindow = () => {
   mainWindow = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
+    icon: path.join(appPath, 'public', 'electron-vite.svg'),
     width: 1200,
     height: 800,
-    show: false, // Show the main window immediately
+    show: false, // Prevent flashing on startup
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
-      nodeIntegration: false, // Keep security best practices
+      nodeIntegration: false,
       contextIsolation: true,
-      //webSecurity: false,
+      webSecurity: isDev ? false : true, // Disable in dev, enable in production
     },
   });
 
-  // Maximize the window
   mainWindow.maximize();
 
-  // Load correct index.html based on environment
-  if (isDev) {
-    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL!);
+  // ✅ Load correct index.html
+  const indexPath = `file://${path.join(rendererDist, "index.html")}`;
+  console.log('🔎 Attempting to load:', indexPath);
+
+  if (fs.existsSync(path.join(rendererDist, "index.html"))) {
+    console.log('✅ index.html found, loading...');
+    mainWindow.loadURL(indexPath).catch(err => console.error('❌ Failed to load index.html:', err));
   } else {
-    mainWindow.loadFile(path.join(rendererDist, "index.html"));
+    console.error('❌ index.html NOT found:', indexPath);
+    dialog.showErrorBox('Startup Error', 'Wagewise failed to load. Please reinstall the application.');
+    app.quit();
   }
 
-  // Show the window once it's ready
-  mainWindow.on('ready-to-show', () => {
+  mainWindow.once('ready-to-show', () => {
     mainWindow?.show();
   });
-
-  // Test active push message to Renderer-process.
-  mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow?.webContents.send('main-process-message', new Date().toLocaleString());
-  });
-
-  if (VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(VITE_DEV_SERVER_URL);
-  } else {
-    mainWindow.loadFile(path.join(RENDERER_DIST, 'index.html'));
-  }
 
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
 };
 
-// App lifecycle
 app.whenReady().then(() => {
-  // Create the main window
+  console.log('✅ App is ready');
   createMainWindow();
 
-   // ✅ Check for updates when the app starts
-   if (!isDev) {
+  if (!isDev) {
+    console.log('🔄 Checking for updates...');
+    autoUpdater.setFeedURL({
+      provider: 'github',
+      owner: 'ashley-chiteri',
+      repo: 'wagewise-frontend',
+    });
     autoUpdater.checkForUpdatesAndNotify();
   }
 });
 
-// Quit when all windows are closed, except on macOS.
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  if (process.platform !== 'darwin') app.quit();
 });
 
-// On macOS, re-create the main window if the app is activated and no windows are open.
 app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createMainWindow();
-  }
+  if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
 });
 
-// ✅ Auto-Updater Events
+// ✅ Auto-Updater Events (Only in Production)
 if (!isDev) {
   autoUpdater.on('update-available', () => {
+    console.log('⬆️ Update available');
     if (mainWindow) {
       dialog.showMessageBox(mainWindow, {
-        type: "info",
-        title: "Update Available",
-        message: "A new version of Wagewise is available. It will be downloaded in the background.",
-        buttons: ["OK"]
+        type: 'info',
+        title: 'Update Available',
+        message: 'A new version of Wagewise is available. It will be downloaded in the background.',
+        buttons: ['OK'],
       });
     }
   });
 
-autoUpdater.on('update-downloaded', () => {
-  if (mainWindow) {
-    dialog.showMessageBox(mainWindow, {
-      type: "info",
-      title: "Update Ready",
-      message: "The update has been downloaded. Restart Wagewise to apply the update.",
-      buttons: ["Restart Now", "Later"]
-    }).then(result => {
-      if (result.response === 0) { // Restart Now
-        autoUpdater.quitAndInstall();
-      }
-    });
-  }
-});
+  autoUpdater.on('update-downloaded', () => {
+    console.log('⬇️ Update downloaded');
+    if (mainWindow) {
+      dialog.showMessageBox(mainWindow, {
+        type: 'info',
+        title: 'Update Ready',
+        message: 'The update has been downloaded. Restart Wagewise to apply the update.',
+        buttons: ['Restart Now', 'Later'],
+      }).then(result => {
+        if (result.response === 0) autoUpdater.quitAndInstall();
+      });
+    }
+  });
 
-autoUpdater.on('error', (error) => {
-  console.error("Update Error:", error);
-});
+  autoUpdater.on('error', error => {
+    console.error('❌ Update Error:', error);
+  });
 }

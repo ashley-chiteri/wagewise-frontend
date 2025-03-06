@@ -2,28 +2,29 @@
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
   "appId": "com.ashleychiteri.wagewise",
-  "asar": true,
   "productName": "Wagewise",
+  "asar": true,
   "directories": {
     "output": "release/${version}"
   },
   "files": [
-    "dist/**/*",
-    "dist-electron/**/*"
+    "package.json",
+    {
+      "from": "dist",
+      "to": "dist",
+      "filter": ["**/*"]
+    },
+    {
+      "from": "dist-electron",
+      "to": "dist-electron",
+      "filter": ["**/*"]
+    }
   ],
-  "mac": {
-    "target": [
-      "dmg"
-    ],
-    "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
-  },
   "win": {
     "target": [
       {
         "target": "nsis",
-        "arch": [
-          "x64"
-        ]
+        "arch": ["x64"]
       }
     ],
     "artifactName": "Wagewise-Windows-${version}-Setup.${ext}"
@@ -34,18 +35,13 @@
     "allowToChangeInstallationDirectory": true,
     "deleteAppDataOnUninstall": false
   },
-  "linux": {
-    "target": [
-      "AppImage"
-    ],
-    "artifactName": "Wagewise-Linux-${version}.${ext}"
-  },
-   "compression": "maximum",
+  "compression": "maximum",
   "publish": [
     {
       "provider": "github",
-      "repo": "wagewise_frontend",
+      "repo": "wagewise-frontend",
       "owner": "ashley-chiteri",
-      "releaseType": "draft"
-    }]
+      "releaseType": "release"
+    }
+  ]
 }

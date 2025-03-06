@@ -84,7 +84,7 @@ const ReportPage = () => {
             <h2 className="text-lg font-semibold text-gray-700 mb-4">Spending Breakdown</h2>
             <PieChart width={350} height={350}>
               <Pie data={sampleData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
-                {sampleData.map((entry, index) => (
+                {sampleData.map((_entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
