@@ -1,33 +1,30 @@
-import { defineConfig } from 'vite'
-import tailwindcss from '@tailwindcss/vite'
-import path from 'node:path'
-import electron from 'vite-plugin-electron/simple'
-import react from '@vitejs/plugin-react'
-import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
-import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfill';
+import { defineConfig } from 'vite';
+import tailwindcss from '@tailwindcss/vite';
+import path from 'node:path';
+import electron from 'vite-plugin-electron/simple';
+import react from '@vitejs/plugin-react';
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
     electron({
       main: {
-        // Shortcut of `build.lib.entry`.
-        entry: 'electron/main.ts',
+        entry: 'electron/main.ts', // Entry point for the Electron main process
       },
       preload: {
-        // Shortcut of `build.rollupOptions.input`.
-        // Preload scripts may contain Web assets, so use the `build.rollupOptions.input` instead `build.lib.entry`.
-        input: path.join(__dirname, 'electron/preload.ts'),
+        input: path.join(__dirname, 'electron/preload.ts'), // Entry point for the preload script
       },
-      // Ployfill the Electron and Node.js API for Renderer process.
-      // If you want use Node.js in Renderer process, the `nodeIntegration` needs to be enabled in the Main process.
-      // See 👉 https://github.com/electron-vite/vite-plugin-electron-renderer
-      renderer: process.env.NODE_ENV === 'test'
-        // https://github.com/electron-vite/vite-plugin-electron-renderer/issues/78#issuecomment-2053600808
-        ? undefined
-        : {},
+      renderer: process.env.NODE_ENV === 'test' ? undefined : {}, // Renderer process configuration
     }),
   ],
-})
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'), // Add an alias for the src directory
+    },
+  },
+  build: {
+    outDir: 'dist', // Output directory for the build
+    emptyOutDir: true, // Clear the output directory before building
+  },
+});
