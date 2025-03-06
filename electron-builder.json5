@@ -2,23 +2,14 @@
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
   "appId": "com.ashleychiteri.wagewise",
-  "productName": "Wagewise",
   "asar": true,
+  "productName": "Wagewise",  
   "directories": {
     "output": "release/${version}"
   },
   "files": [
-    "package.json",
-    {
-      "from": "dist",
-      "to": "dist",
-      "filter": ["**/*"]
-    },
-    {
-      "from": "dist-electron",
-      "to": "dist-electron",
-      "filter": ["**/*"]
-    }
+    "dist",
+    "dist-electron"
   ],
   "win": {
     "target": [
