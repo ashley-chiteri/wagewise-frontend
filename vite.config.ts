@@ -3,6 +3,8 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
 import electron from 'vite-plugin-electron/simple'
 import react from '@vitejs/plugin-react'
+import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
+import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfill';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -28,4 +30,21 @@ export default defineConfig({
         : {},
     }),
   ],
+   optimizeDeps: {
+    esbuildOptions: {
+      plugins: [
+        NodeGlobalsPolyfillPlugin({
+          buffer: true,
+        }),
+        NodeModulesPolyfillPlugin(),
+      ],
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: undefined, // Adjust as needed
+      },
+    },
+  },
 })
