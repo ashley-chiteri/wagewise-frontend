@@ -3,32 +3,34 @@ name: Build and Release Wagewise
 on:
   push:
     tags:
-      - "v*.*.*" # Triggers when you push a new version tag (e.g., v1.0.0)
+      - 'v*.*.*'
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
 
-      - name: Install dependencies
-        run: npm install
+    - name: Install dependencies
+      run: npm install
 
-      - name: Build Electron app
-        run: npm run build
+    - name: Build project
+      run: npm run build
 
-      - name: Package Electron app
-        run: npx electron-builder --win --publish always
+    - name: Set up Electron Builder
+      run: npm install electron-builder
 
-      - name: Upload release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: release/**/*.exe
-          token: ${{ secrets.GH_TOKEN }}
+    - name: Package application
+      run: npm run package
+
+    - name: Publish to GitHub Releases
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: npx electron-builder --publish=always
