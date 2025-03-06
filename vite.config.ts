@@ -30,21 +30,4 @@ export default defineConfig({
         : {},
     }),
   ],
-   optimizeDeps: {
-    esbuildOptions: {
-      plugins: [
-        NodeGlobalsPolyfillPlugin({
-          buffer: true,
-        }),
-        NodeModulesPolyfillPlugin(),
-      ],
-    },
-  },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: undefined, // Adjust as needed
-      },
-    },
-  },
 })
