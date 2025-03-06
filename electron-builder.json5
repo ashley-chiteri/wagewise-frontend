@@ -4,7 +4,6 @@
   "appId": "com.ashleychiteri.wagewise",
   "asar": true,
   "productName": "Wagewise",
-  "author": "Ashley Chiteri",
   "directories": {
     "output": "release/${version}"
   },
@@ -48,5 +47,5 @@
       "repo": "wagewise_frontend",
       "owner": "ashley-chiteri",
       "releaseType": "draft"
-    }
+    }]
 }
