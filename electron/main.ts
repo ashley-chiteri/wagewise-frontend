@@ -22,6 +22,9 @@ const rendererDist = isDev
 console.log('📂 App path:', appPath);
 console.log('📂 Renderer dist path:', rendererDist);
 
+/**
+ * Create the main application window.
+ */
 const createMainWindow = () => {
   mainWindow = new BrowserWindow({
     icon: path.join(appPath, 'public', 'electron-vite.svg'),
@@ -32,19 +35,23 @@ const createMainWindow = () => {
       preload: path.join(__dirname, 'preload.mjs'),
       nodeIntegration: false,
       contextIsolation: true,
-      webSecurity: isDev ? false : true, // Disable in dev, enable in production
+      webSecurity: !isDev, // Disable in dev, enable in production
     },
   });
 
   mainWindow.maximize();
 
   // ✅ Load correct index.html
-  const indexPath = `file://${path.join(rendererDist, "index.html")}`;
+  const indexPath = `file://${path.join(rendererDist, 'index.html')}`;
   console.log('🔎 Attempting to load:', indexPath);
 
-  if (fs.existsSync(path.join(rendererDist, "index.html"))) {
+  if (fs.existsSync(path.join(rendererDist, 'index.html'))) {
     console.log('✅ index.html found, loading...');
-    mainWindow.loadURL(indexPath).catch(err => console.error('❌ Failed to load index.html:', err));
+    mainWindow.loadURL(indexPath).catch((err) => {
+      console.error('❌ Failed to load index.html:', err);
+      dialog.showErrorBox('Startup Error', 'Wagewise failed to load. Please reinstall the application.');
+      app.quit();
+    });
   } else {
     console.error('❌ index.html NOT found:', indexPath);
     dialog.showErrorBox('Startup Error', 'Wagewise failed to load. Please reinstall the application.');
@@ -60,7 +67,10 @@ const createMainWindow = () => {
   });
 };
 
-app.whenReady().then(() => {
+/**
+ * Initialize the application.
+ */
+const initializeApp = () => {
   console.log('✅ App is ready');
   createMainWindow();
 
@@ -73,18 +83,12 @@ app.whenReady().then(() => {
     });
     autoUpdater.checkForUpdatesAndNotify();
   }
-});
+};
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
-});
-
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
-});
-
-// ✅ Auto-Updater Events (Only in Production)
-if (!isDev) {
+/**
+ * Handle auto-updater events.
+ */
+const setupAutoUpdater = () => {
   autoUpdater.on('update-available', () => {
     console.log('⬆️ Update available');
     if (mainWindow) {
@@ -105,13 +109,31 @@ if (!isDev) {
         title: 'Update Ready',
         message: 'The update has been downloaded. Restart Wagewise to apply the update.',
         buttons: ['Restart Now', 'Later'],
-      }).then(result => {
+      }).then((result) => {
         if (result.response === 0) autoUpdater.quitAndInstall();
       });
     }
   });
 
-  autoUpdater.on('error', error => {
+  autoUpdater.on('error', (error) => {
     console.error('❌ Update Error:', error);
   });
+};
+
+// ✅ Initialize the app
+app.whenReady().then(initializeApp);
+
+// ✅ Quit the app when all windows are closed (except on macOS)
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
+
+// ✅ Recreate the window if the app is activated (macOS)
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
+});
+
+// ✅ Set up auto-updater (only in production)
+if (!isDev) {
+  setupAutoUpdater();
 }
